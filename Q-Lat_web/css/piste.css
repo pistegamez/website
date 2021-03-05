@@ -1,0 +1,303 @@
+.body {
+	background-color:#28D;
+	background-image:url('page_bg.jpg');
+	background-repeat:repeat-x;
+	background-position:top left;
+}
+
+.hiscore {
+}
+
+.new_hiscore {
+	background-color:BCF;
+	border:solid 1px #EEF;
+}
+
+
+hr {
+	border:solid 0px #88A;
+	border-top:solid 1px #88A;
+	height:1px;
+}
+
+.canvas1{
+	border-top:solid 1px #24A;
+	border-bottom:solid 1px #4AF;
+	border-left:solid 1px #24A;
+	border-right:solid 1px #4AF;
+	width:500;
+	height:500;
+	position:absolute;
+	left:0;
+	top:0;
+}
+
+.canvas2{
+	border-top:solid 1px #24A;
+	border-bottom:solid 1px #4AF;
+	border-left:solid 1px #24A;
+	border-right:solid 1px #4AF;
+	width:500;
+	height:500;
+	position:relative;
+	left:0;
+	top:0;
+}
+
+.content {
+	font:normal 10px Verdana, Arial;
+}
+
+.content_browser_support {
+	font:normal 10px Verdana;
+	border: solid 0px #FFF;
+}
+
+.floating_content {
+	font:normal 10px Verdana;
+	float:left;
+}
+
+.heading1 {
+	font:bold 20px Verdana;
+	color:#FFF;
+}
+
+.heading2 {
+	font:bold 14px Arial;
+	color:#000;
+	
+}
+
+.heading3 {
+	font:bold 10px Verdana;color:#000;
+	text-decoration:underline;
+}
+
+
+.input {
+	border-top:solid 1px #224;
+	border-bottom:solid 1px #88F;
+	border-left:solid 1px #448;
+	border-right:solid 1px #669;
+	background-color: #DDD;
+	font:normal 10px Verdana;
+	color:#333;
+}
+
+.button {
+	border-top:solid 1px #DDD;
+	border-bottom:solid 1px #88D;
+	border-left:solid 1px #99D;
+	border-right:solid 1px #99D;
+	color:#FFF;
+	background-color: #8AF;
+}
+
+.button_new_game {
+	border-top:solid 1px #DDD;
+	border-bottom:solid 1px #A44;
+	border-left:solid 1px #D88;
+	border-right:solid 1px #D88;
+	color:#FFF;
+	background-color: #F93;
+}
+
+.reuna1_vasen_yla {
+	background-image:url('reuna1_vasen_yla_12x12.png');
+	background-repeat:no-repeat;
+	background-position:top left;
+	width:12px;
+	height:12px;
+}
+
+.reuna1_keski_yla {
+	background-image:url('reuna1_keski_yla_2x12.png');
+	background-repeat:repeat-x;
+	background-position:top left;
+	height:12px;
+}
+
+.reuna1_oikea_yla {
+	background-image:url('reuna1_oikea_yla_12x12.png');
+	background-repeat:no-repeat;
+	background-position:top left;
+	height:12px;
+	width:12px;
+}
+
+.reuna1_vasen_keski {
+	background-image:url('reuna1_vasen_keski_12x2.png');
+	background-repeat:repeat-y;
+	background-position:top left;
+	width:12px;
+}
+.reuna1_keski {
+	background-color:#FFF;
+	margin:0px;
+	padding-left:0px;
+	padding-top:0px;
+	font-family:verdana;
+	font-size:12px;
+	vertical-align:top;
+}
+.reuna1_oikea_keski {
+	background-image:url('reuna1_oikea_keski_12x2.png');
+	background-repeat:repeat-y;
+	background-position:top left;
+	width:12px;
+}
+
+.reuna1_vasen_ala {
+	background-image:url('reuna1_vasen_ala_12x17.png');
+	background-repeat:no-repeat;
+	background-position:top left;
+	width:12px;
+	height:17px;
+}
+.reuna1_keski_ala {
+	background-image:url('reuna1_keski_ala_2x17.png');
+	background-repeat:repeat-x;
+	background-position:top left;
+	height:17px;
+}
+.reuna1_oikea_ala {
+	background-image:url('reuna1_oikea_ala_12x17.png');
+	background-repeat:no-repeat;
+	background-position:top left;
+	height:17px;
+	width:12px;
+}
+
+
+.reuna2_vasen_yla {
+	background-image:url('reuna2_vasen_yla_12x12.png');
+	background-repeat:no-repeat;
+	background-position:top left;
+	width:12px;
+	height:12px;
+}
+
+.reuna2_keski_yla {
+	background-image:url('reuna2_keski_yla_2x12.png');
+	background-repeat:repeat-x;
+	background-position:top left;
+	height:12px;
+}
+
+.reuna2_oikea_yla {
+	background-image:url('reuna2_oikea_yla_12x12.png');
+	background-repeat:no-repeat;
+	background-position:top left;
+	height:12px;
+	width:12px;
+}
+
+.reuna2_vasen_keski {
+	background-image:url('reuna2_vasen_keski_12x2.png');
+	background-repeat:repeat-y;
+	background-position:top left;
+	width:12px;
+}
+.reuna2_keski {
+	background-image:url('reuna2_keski_2x2.png');
+	margin:0px;
+	padding-left:0px;
+	padding-top:0px;
+	font-family:verdana;
+	font-size:12px;
+	vertical-align:top;
+}
+.reuna2_oikea_keski {
+	background-image:url('reuna2_oikea_keski_12x2.png');
+	background-repeat:repeat-y;
+	background-position:top left;
+	width:12px;
+}
+
+.reuna2_vasen_ala {
+	background-image:url('reuna2_vasen_ala_12x17.png');
+	background-repeat:no-repeat;
+	background-position:top left;
+	width:12px;
+	height:17px;
+}
+.reuna2_keski_ala {
+	background-image:url('reuna2_keski_ala_2x17.png');
+	background-repeat:repeat-x;
+	background-position:top left;
+	height:17px;
+}
+.reuna2_oikea_ala {
+	background-image:url('reuna2_oikea_ala_12x17.png');
+	background-repeat:no-repeat;
+	background-position:top left;
+	height:17px;
+	width:12px;
+}
+
+
+.reuna3_vasen_yla {
+	background-image:url('reuna3_vasen_yla_7x7.png');
+	background-repeat:no-repeat;
+	background-position:top left;
+	width:7px;
+	height:7px;
+}
+
+.reuna3_keski_yla {
+	background-image:url('reuna3_keski_yla_2x7.png');
+	background-repeat:repeat-x;
+	background-position:top left;
+	height:7px;
+}
+
+.reuna3_oikea_yla {
+	background-image:url('reuna3_oikea_yla_7x7.png');
+	background-repeat:no-repeat;
+	background-position:top left;
+	height:7px;
+	width:7px;
+}
+
+.reuna3_vasen_keski {
+	background-image:url('reuna3_vasen_keski_7x2.png');
+	background-repeat:repeat-y;
+	background-position:top left;
+	width:7px;
+}
+.reuna3_keski {
+	margin:0px;
+	padding-left:0px;
+	padding-top:0px;
+	font-family:verdana;
+	font-size:12px;
+	vertical-align:top;
+}
+.reuna3_oikea_keski {
+	background-image:url('reuna3_oikea_keski_7x2.png');
+	background-repeat:repeat-y;
+	background-position:top left;
+	width:7px;
+}
+
+.reuna3_vasen_ala {
+	background-image:url('reuna3_vasen_ala_7x7.png');
+	background-repeat:no-repeat;
+	background-position:top left;
+	width:7px;
+	height:7px;
+}
+.reuna3_keski_ala {
+	background-image:url('reuna3_keski_ala_2x7.png');
+	background-repeat:repeat-x;
+	background-position:top left;
+	height:7px;
+}
+.reuna3_oikea_ala {
+	background-image:url('reuna3_oikea_ala_7x7.png');
+	background-repeat:no-repeat;
+	background-position:top left;
+	height:7px;
+	width:7px;
+}

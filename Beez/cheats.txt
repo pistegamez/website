@@ -1,0 +1,65 @@
+BEEZ TIPS
+---------
+
+Level 1
+There are 2 exits in this level. The second one (you can see it if you press CTRL
+during the game) is located at up in the right corner of the level.
+
+Level 2
+The obstacle at the end of the level must be destroyed using grenades. There
+is also a way to go around, or actually under it. There is a small muddy waterfall
+near the beginnig of the level. You can walt through the wall at the top of the 
+waterfall on the right. You can find many bonuses there and another wall that
+you can walk through. At the top left corner of the level there is a place
+with some useful bonuses as well.
+
+Level 3
+All closed doors can be destroyed using missiles or grenades.
+Watch out for the mean fly with a lasergun at the top floors of the
+nest. It's hidding one of the eggs you must save.
+You can control the other beez using your "body language". 
+
+Level 5
+After the long shaft with moving spike walls there is a big open place.
+At the down right corner there is a wall that you can walk through.
+From the cave behind the wall you can find even another wall
+that you can walk/fly through.
+
+Level 6
+Easiest way to clear this level, is to fly as top as you can get. Get rid 
+of the grenade dropping dragon flies and it get's much more safe to clear
+the rest of the level.
+
+Quite near the missile shooting dragon flies, there is an open space with moving 
+spike floors. At the left up corner of the place you can find an invisible 
+special bonus: You'll either get another bee to help you, or you'll be able to
+mask your self as a mosquito. The other mosquitos won't shoot you if you look
+like one of them!
+
+There are lot's of secret bonuses in the game and it's up to you to find the rest :)
+
+BEEZ CHEATS   
+-----------
+start the game by typing a command:
+
+beez -longlivethequeen
+
+You can now use the following buttons during the game:
+
+E	More energy (If you die this will bring you back to life)
+U	Upgrade you gun
+F	Fly-o-meter full
+G	More grenades
+M	More missiles
+END	Level cleared
+R	Start the level again (you won't loose a life)
+
+Some funny not so usefull cheats
+
+5	Change the player's bee to some of the enemy (if you're a spike floor you 
+	can kill enemys by touching them).
+
+1	Focus camera to player
+2	Focus camera to next bug
+3	Focus camera to previous bug
+		

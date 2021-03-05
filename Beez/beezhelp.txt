@@ -1,0 +1,45 @@
+How to install and run Beez (for dummies)?
+------------------------------------------
+
+I wrote this document because I've had many e-mails from people who have had
+problems installing and running Beez. Installing and running Beez is a bit more
+tricky, because Beez is not a Windows game. It needs MS-DOS or Windows' MS-DOS mode 
+to run correctly. It's a bit confusing, if you don't have a clue, what MS-DOS is.
+To run Beez under Windows, you must do the following:
+
+Installing
+----------
+1.	Download Beez (Beez.zip) from pistegamez.cjb.net/beez
+2.	Create a new folder (directory) for Beez (eg. C:\Games\Beez)
+3.	Extract Beez.zip using eg. WinZip. 
+	Etract the files to the folder you just created (eg. C:\Games\Beez)
+
+It's almost done!
+
+4.	Press Windows' Start button (the one in the down left corner) and select Run...
+5.	Press 'Browse' button.  
+6.	Select the folder where you extracted the game and choose Msetup.exe
+	(eg. C:\Games\Beez\Msetup.exe).
+7.	All you need to do is press Enter 6 times.  
+
+Executing under Windows
+-----------------------
+
+1.	Right click on you desktop. Choose New - Shortcut.
+2.	Press Browse button. 
+3.	Choose Beez.exe from the folder you created (eg. C:\Games\Beez\Beez.exe)
+4.	Press Next - Next - Finish.
+5.	There should be a new icon on your desktop called Beez.exe.
+6.	Right click on Beez.exe icon and choose Properties.
+7.	Choose Program leaf and there press the "Advanced..." button.
+8.	Choose MS-DOS mode. Press Ok.
+9.	Double click the Beez.exe icon to run the game. 
+
+	Computer will switch between 
+	Windows	and MS-DOS before and after the game, so you will see black text screens
+	and other spooky things happening on you screen :)
+
+Have fun!
+
+Janne Kivilahti / pistegamez.cjb.net
+http://pistegamez.cjb.net

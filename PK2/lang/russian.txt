@@ -1,0 +1,176 @@
+Setup 
+------------------------------------------------------------------------------------
+*setup options:				Nastrojki
+*setup video modes:			Video rezhimy
+*setup music & sounds:		Muzyka i zvukovye effekty
+*setup music:				Muzyka
+*setup sounds:				Effekty
+*setup language:			Yazyk
+*setup play:				Igrat
+*setup exit:				Vyhod
+
+Intro
+------------------------------------------------------------------------------------
+*intro presents:			presents 2003
+*intro a game by:			igra ot
+*intro original character design:	originalnyj dizajn personazhej
+*intro tested by:			protestirovanno
+*intro thanks to:			thanks to
+*intro translation:			english translation
+*intro translator:			janne kivilahti
+
+Main Menu
+------------------------------------------------------------------------------------
+*main menu new game:			novaja igra
+*main menu continue:			prodolzhit
+*main menu load game:			zagruzit
+*main menu save game:			sohranit
+*main menu controls:			upravlenie
+*main menu graphics:			grafika
+*main menu sounds:			zvuk
+*main menu exit game:			vyhod
+
+*back to main menu:			nazad v menju
+
+Load Game
+------------------------------------------------------------------------------------
+*load menu title:			zagruzit
+*load menu info:			vyberite igru, kotoruju hotite zagruzit
+*load menu episode:			epizod: 
+*load menu level:			uroven: 
+
+Save Game
+------------------------------------------------------------------------------------
+*save menu title:			sohranit
+*save menu info:			ukazhite kuda sohranjat
+*save menu episode:			epizod: 
+*save menu level:			uroven: 
+
+Game Controls
+------------------------------------------------------------------------------------
+*controls menu title:			upravlenie
+*controls menu move left:		vlevo
+*controls menu move right:		vpravo
+*controls menu jump:			pryzhok
+*controls menu duck:			duck
+*controls menu walk slow:		idti medlenno
+*controls menu egg attack:		ataka jajcami
+*controls menu doodle attack:		ataka dudlom
+*controls menu use item:		ispolzovat
+*controls menu edit:			redaktirovat
+*controls menu keyboard def:		po-umolchaniju
+*controls menu gamepad4:		standartnyj 4-knopochnyj gamepad
+*controls menu gamepad6:		standartnyj 6-knopochnyj gamepad
+
+Sounds
+------------------------------------------------------------------------------------
+*sounds menu title:			zvuk i muzyka
+*sounds menu sfx volume:		gromkost effektov
+*sounds menu music volume:		gromkost musyki
+*sounds menu more:			gromche
+*sounds menu less:			tishe
+
+Graphics
+------------------------------------------------------------------------------------
+*graphics menu title:				grafika
+*graphics menu transparency fx on:		prozrachnost vkljuchena
+*graphics menu transparency fx off:		prozrachnost vykljuchena
+*graphics menu menus are transparent:		prozrachnyj tekst menju vkljuchen
+*graphics menu menus are not transparent:	prozrachnyj tekst menju vykljuchen 
+*graphics menu item bar is visible:		panel obektov vidna
+*graphics menu item bar is not visible:		panel obektov ne vidna
+*graphics menu weather fx on:			pogoda vkljuchena
+*graphics menu weather fx off:			pogoda vykljuchena
+*graphics menu bg sprites on:			fon vkljuchen
+*graphics menu bg sprites off:			fon vykljuchen
+*graphics menu game speed normal:		normalnaja skorost igry  
+*graphics menu game speed double:		dvojnaja skorost igry 
+
+Players name
+------------------------------------------------------------------------------------
+*player screen type your name:		vashe imja
+*player screen continue:		ok
+*player screen clear:			ochistit
+*player default name:			pekka-ru
+
+Episodes
+------------------------------------------------------------------------------------
+*episode menu choose episode:		vyberite epizod
+*episode menu get more episodes at:	bolshe epizodov na http://pistegamez.cjb.net
+*episode menu no maps:			net karty dlja epizoda!?
+
+Map
+------------------------------------------------------------------------------------
+*map screen total score:		ochki
+*map screen next level:			sledujuschij uroven
+*episode best player:			chempion epizoda:
+*episode hiscore:			rekord
+*level best player:			luchshij igrok
+*level hiscore:				ochki:
+*level fastest player:			samyj bystryj igrok
+*level best time:			vremja:
+
+Scores
+------------------------------------------------------------------------------------
+*score screen title:			vsego ochkov
+*score screen level score:		ochki za uroven
+*score screen bonus score:		bonus
+*score screen time score:		bonus za vremja
+*score screen energy score:		bonus za energiju
+*score screen item score:		bonus za predmety
+*score screen continue:			karta
+*score screen total score:		vsego ochkov
+*score screen new level hiscore:	vy pobili rekord!
+*score screen new level best time:	vi samyj bystryj igrok!
+*score screen new episode hiscore:	vi chempion epizoda!
+
+Game
+------------------------------------------------------------------------------------
+*score:					ochki:
+*game time:				vremja:
+*energy:				zdorovje:
+*items:					predmety:
+*attack 1:				dudl:
+*attack 2:				jajca:
+*keys:					kljuchi:
+*level clear:				uroven projden!
+*time bonus:			
+*game paused:				pausa...
+*knocked out:				igra okonchena!
+*time out:				vremja vyshlo!
+*try again:				poprobujte escho raz!
+*locks open:				vse zamki otkryti!
+*new doodle attack:			novyj dudl!
+*new egg attack:			novye jajca!
+*new item:				novyj predmet!
+
+*loading:				zagruzka...
+
+The End
+------------------------------------------------------------------------------------
+*end congratulations:			pozdravljaem!
+*end chickens saved:			vi spasli cipljat!
+*end the end:				konec
+
+Info Signs
+------------------------------------------------------------------------------------
+*info01:			ispolzujte megafon chtob ubit vraga!
+*info02:			kidajte jajca na vragov!
+*info03:			najdite znak vyhod!
+*info04:			zamki otkrojutsja kogda najdete vse kljuchi.
+*info05:			prygajte na knopku chtob vkljuchit.
+*info06:			zelenye knopki dvigajut steny s zelenymi strelkami.
+*info07:			sinie knopki dvigajut steny s sinimi strelkami.
+*info08:			oranzhevaja knopka vykljuchaet ogon.
+*info09:			vy mozhete ispolzovat predmety kogda ugodno.
+*info10:			perja vosstanavlivajut zdorovje.
+*info11:			teleporty kovarny! ne zabludites!
+*info12:			vybitye predmety i bonusy uvelichivajut ochki.
+*info13:			ischite skrytye bonusy!
+*info14:			zamok otkryvaetsa, esli ego kasaetsa kljuch.
+*info15:			beregites lovushek! ho ho ho...
+*info16:			bystree! vremja konchaetsja!
+*info17:			beregites golodnyh zhivotnyh!
+*info18:			beregites silnogo vetra!
+*info19:			spasite cipljat!
+		

@@ -1,0 +1,1425 @@
+<html>
+<head>
+	<title>Q-Lat (browser version)</title>
+	<meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
+	<meta http-equiv="PRAGMA" content="NO-CACHE">
+	<meta name="AUTHOR" content="Janne Kivilahti / Piste Gamez">
+	<meta name="COPYRIGHT" content="&copy; 2009 Janne Kivilahti">
+	<meta name="DESCRIPTION" content="Q-Lat game browser edition">
+	<meta name="KEYWORDS" content="Q-Lat, game, browser, Piste Gamez">
+	<link rel="stylesheet" type="text/css" href="css/piste.css" />
+	<script type="text/javascript" src="js/piste_html.js"></script>	
+	<script type="text/javascript" src="js/piste.js"></script>	
+	<script type="text/javascript" src="js/debug.js"></script>	
+<script  type="text/javascript">
+
+var MODE_INIT = 0;
+var MODE_PLAY = 1;
+var MODE_PAUSE = 2;
+var MODE_GAMEOVER = 3;
+var MODE_DONE = 4;
+var MODE_HISCORES = 5;
+var MODE_INTRO = 6;
+
+var canvas;
+var canvasBG;
+var ctx;
+var ctxBG;
+var gameIntervalID;
+var renderIntervalID;
+var timerIntervalID = -1;
+var screenWidth = 500;
+var screenHeight = 500;
+var gameMode = MODE_INIT;
+var pauseDrawn = false;
+var loopInterval = 1000/40;//1000/60;
+var loops = 0;
+var flipSide = true;
+
+var seconds = 0;
+var scoreP1 = 0;
+var stageClear;
+var fadeInCounter = 1.0;
+var fadeColor;
+
+var COLOR_GRAY = 0;
+var COLOR_RED = 1;
+var COLOR_GREEN = 2;
+var COLOR_BLUE = 3;
+var COLOR_ORANGE = 4;
+var COLOR_PURPLE = 5;
+
+var PARTICLE_DEFAULT = 0;
+var PARTICLE_DOT = 1;
+
+var	last_purple = -1;
+var	last_yellow = -1;
+var	last_red = -1;
+var	last_green = -1;
+var	last_blue = -1;
+var	last_gray = -1;
+
+var numOfBalls = 35;
+var balls = new Array();
+var grays = 0;
+var reds = 0;
+var greens = 0;
+var blues = 0;
+var oranges = 0;
+var purples = 0;
+var timer = 0;
+var gameTime = 3*60;
+
+var numOfHiscores = 20;
+var hiscores = new Array();
+var enableHiscores = true;
+var newHiscoreIndex = -1;
+
+var numOfParticles = 100;
+var particleIndex = 0;
+var particles = new Array();
+var enableParticles = true;
+var activeParticles = false;
+
+var imgSphere16 = new Image();
+var imgSphere24gray = new Image();
+var imgSphere24red = new Image();
+var imgSphere24green = new Image();
+var imgSphere24blue = new Image();
+var imgSphere24orange = new Image();
+var imgSphere24purple = new Image();
+var imgBG01 = new Image();
+var imgSplatterGray = new Image();
+var imgSplatterRed = new Image();
+var imgSplatterGreen = new Image();
+var imgSplatterBlue = new Image();
+var imgSplatterOrange = new Image();
+var imgSplatterPurple = new Image();
+var imgDotGray = new Image();
+var imgDotRed = new Image();
+var imgDotGreen = new Image();
+var imgDotBlue = new Image();
+var imgDotOrange = new Image();
+var imgDotPurple = new Image();
+var imgTitle = new Image();
+
+var updateBG = true;
+
+var gameloopDone = true;
+var renderloopDone = true;
+
+function Particle(image,type,x,y,velx,vely,life,ctx) {
+	//var p = new Object();
+	//this.image = image;
+	this.type = type;
+	this.x = x;
+	this.y = y;
+	this.velx = velx;
+	this.vely = vely;
+	this.life = life;
+	this.ctx = ctx;
+	
+	//return p;
+}
+
+function moveParticles() {
+
+	if (!activeParticles)
+		return;
+
+	activeParticles = false;
+
+	for (var i in particles) {
+		if (particles[i].life > 0) {
+			particles[i].move();
+			activeParticles = true;
+		}
+	}
+}
+
+function renderParticles() {
+	
+	if (!activeParticles)
+		return;
+
+	for (var i in particles) {
+		if (particles[i].life > 0) {
+			particles[i].draw();
+		}
+	}
+}
+
+function particleMoveDot() {
+	this.x += this.velx;
+	this.y += this.vely;
+	this.velx /= 1.05;
+	this.vely /= 1.05;
+	if (this.life > 1)
+		this.life--;
+	this.dist++;
+}
+
+function particleDrawDot() {
+	if (this.life==1) {
+		ctxBG.drawImage(this.image,this.x,this.y,16/(this.dist/2),16/(this.dist/2));
+		this.life = 0;
+	}
+	else if (this.life<4)
+		ctxBG.drawImage(this.image,this.x,this.y,8/(this.dist/2),8/(this.dist/2));
+	else
+		ctx.drawImage(this.image,this.x,this.y,8/(this.dist/2),8/(this.dist/2));
+}
+
+function addParticleEffectDots(color,num,x,y,velx,vely) {
+
+	if (!allImagesLoaded || !enableParticles)
+		return;
+
+	if (color == COLOR_GRAY)
+		var image = imgDotGray;
+	else if (color == COLOR_RED)
+		var image = imgDotRed;
+	else if (color == COLOR_GREEN)
+		var image = imgDotGreen;
+	else if (color == COLOR_BLUE)
+		var image = imgDotBlue;
+	else if (color == COLOR_ORANGE)
+		var image = imgDotOrange;
+	else if (color == COLOR_PURPLE)
+		var image = imgDotPurple;
+
+	var p;
+	for (var i=0;i<num;i++) {
+	
+		p = particles[particleIndex];
+		p.image = image;
+		p.type = PARTICLE_DOT;
+		p.x = x;
+		p.y = y;
+		p.velx = Math.random()*5-Math.random()*5+velx*5;
+		p.vely = Math.random()*5-Math.random()*5+vely*5;
+		p.life = Math.floor(Math.random()*10)+5;
+		p.ctx = ctxBG;
+		p.move = particleMoveDot;
+		p.draw = particleDrawDot;
+		p.dist = 0;
+
+		particleIndex++;
+		if (particleIndex >= numOfParticles)
+			particleIndex = 0;
+	}
+	
+	activeParticles = true;
+}
+
+function initParticles() {
+	debug('init particles');
+	for (var i=0;i<numOfParticles;i++) {
+		particles[i] = new Particle(null,PARTICLE_DOT,0,0,0.0,0.0,0,null);
+	}
+	particleIndex = 0;
+}
+
+function newHiscore(score,name,stage,time) {
+	var h = new Object();
+	h.score = score;
+	h.name = name;
+	h.stage = stage;
+	h.time = time;
+	return h;
+}
+
+function insertHiscore(hiscore) {
+
+	for (var i=0;i<numOfHiscores;i++) {
+		if (hiscore.score >= hiscores[i].score) {
+			for (var j=numOfHiscores-1;j>i;j--) {
+				hiscores[j].score = hiscores[j-1].score;
+				hiscores[j].name = ''+hiscores[j-1].name;
+				hiscores[j].stage = hiscores[j-1].stage;
+				hiscores[j].time = hiscores[j-1].time;
+			}
+			hiscores[i].score = hiscore.score;
+			hiscores[i].name = ''+hiscore.name;
+			hiscores[i].stage = hiscore.stage;
+			hiscores[i].time = hiscore.time;
+			newHiscoreIndex = i;
+			return;
+		}
+	}
+}
+
+function saveHiscores() {
+	
+	debug('Saving hiscores');
+
+	if (!enableHiscores)
+		return;
+
+	if (typeof localStorage == "undefined" && typeof globalStorage == "undefined") {
+		// client side saving is not supported/enabled
+		return;
+	}
+
+	if (typeof localStorage == "undefined" && typeof globalStorage != "undefined") {
+		try {
+			var localStorage = globalStorage[location.hostname];
+		} catch (e) {
+			return;
+		}
+	}
+
+	for (var i=0;i<numOfHiscores;i++) {
+		localStorage.setItem('qlat_hiscore'+i+'score',''+hiscores[i].score);
+		localStorage.setItem('qlat_hiscore'+i+'name',''+hiscores[i].name);
+		localStorage.setItem('qlat_hiscore'+i+'time',''+hiscores[i].time);
+		localStorage.setItem('qlat_hiscore'+i+'stage',''+hiscores[i].stage);
+	}
+}
+
+function resetHiscores() {
+	
+	debug('reset hiscores');
+	
+	for (var i=0;i<numOfHiscores;i++) {
+		hiscores[i] = newHiscore(500-i*25,'---',0,0);
+	}
+
+	newHiscoreIndex = -1;
+	
+	if (!enableHiscores)
+		return;
+	
+	
+	if (typeof localStorage == "undefined" && typeof globalStorage == "undefined") {
+		// client side saving is not supported/enabled
+		return;
+	}
+
+	if (typeof localStorage == "undefined" && typeof globalStorage != "undefined") {
+		try {
+			var localStorage = globalStorage[location.hostname];
+		}
+		catch (e) {
+			return;
+		}
+	}
+	
+	for (var i=0;i<numOfHiscores;i++) {
+		localStorage.setItem('qlat_hiscore'+i+'score',''+(500-i*25));
+		localStorage.setItem('qlat_hiscore'+i+'name','---');
+		localStorage.setItem('qlat_hiscore'+i+'time','0:00');
+		localStorage.setItem('qlat_hiscore'+i+'stage','0');
+	}
+}
+
+
+function initHiscores() {
+	debug('init hiscores');
+	
+	document.getElementById('playername').value = 'Player';
+	
+	if (typeof localStorage == "undefined" && typeof globalStorage == "undefined") {
+		// client side saving is not supported/enabled
+		debug('localStorage is not supported');
+		enableHiscores = false;
+	}
+
+	if (typeof localStorage == "undefined" && typeof globalStorage != "undefined") {
+		try {
+			debug('localStorage not found. using globalStorage['+location.hostname+']');
+			var localStorage = globalStorage[location.hostname];
+		} catch (e) {
+			enableHiscores = false;
+			debug('no priviliges to access globalStore');
+		}
+	}	
+	
+	if (enableHiscores) {
+	
+		if (localStorage.getItem('player1name')==null) {
+			debug('no player name found. setting it to Player');
+			localStorage.setItem('player1name','Player');
+			//document.getElementById('playername').value='Player';
+		}
+		else {
+			debug('player name found :'+localStorage.getItem('player1name'));
+			document.getElementById('playername').value=''+localStorage.getItem('player1name');
+		}
+	
+		for (var i=0;i<numOfHiscores;i++) {
+			if (localStorage.getItem('qlat_hiscore'+i+'score')==null) {
+				localStorage.setItem('qlat_hiscore'+i+'score',''+(500-i*25));
+				localStorage.setItem('qlat_hiscore'+i+'name','---');
+				localStorage.setItem('qlat_hiscore'+i+'time','0:00');
+				localStorage.setItem('qlat_hiscore'+i+'stage','0');
+				hiscores[i] = newHiscore(500-i*25,'---',0,0);
+			} else {
+				hiscores[i] = newHiscore(
+					parseInt(localStorage.getItem('qlat_hiscore'+i+'score')),
+					localStorage.getItem('qlat_hiscore'+i+'name'),
+					parseInt(localStorage.getItem('qlat_hiscore'+i+'stage')),
+					parseInt(localStorage.getItem('qlat_hiscore'+i+'time')));
+			}
+		}	
+	}
+	else {
+		resetHiscores();
+	}
+}
+
+function onBlur() {
+	debug('onblur');
+	pause = true;
+}
+
+function onFocus() {
+	debug('onfocus');
+	if (pause)
+		pause = false;
+}
+
+function showManualFirstTime() {
+
+	if (typeof localStorage == "undefined" && typeof globalStorage == "undefined") {
+		// client side saving is not supported/enabled
+		document.getElementById('manual').style.visibility = 'visible';
+		return;
+	}
+
+	if (typeof localStorage == "undefined" && typeof globalStorage != "undefined") {
+		try {
+			var localStorage = globalStorage[location.hostname];
+		} catch (e) {
+			document.getElementById('manual').style.visibility = 'visible';
+			return;
+		}
+	}	
+
+	if (localStorage.getItem('qlat_firstTime') == null) {
+		debug('First time!');
+		localStorage.setItem('qlat_firstTime','false');
+		document.getElementById('manual').style.visibility = 'visible';
+	}
+	
+}
+
+function onLoad() {
+	debug('onload');
+	canvas = document.getElementById('game');
+	canvas.setAttribute('width',screenWidth);
+	canvas.setAttribute('height',screenHeight);
+	
+	canvasBG = document.getElementById('bg');
+	canvasBG.setAttribute('width',screenWidth);
+	canvasBG.setAttribute('height',screenHeight);
+	
+	if (canvas.getContext) {
+		ctx = canvas.getContext('2d');
+		ctx.mozImageSmoothingEnabled = false; 
+		ctxBG = canvasBG.getContext('2d');
+		ctxBG.mozImageSmoothingEnabled = false; 
+		init();
+		debug('set intervals');
+		gameIntervalId = setInterval(doGameLoop, 10);
+		renderIntervalId = setInterval(doRenderLoop, loopInterval);
+		fpsIntervalID = setInterval(countFps, 1000);
+		timerIntervalId = setInterval(countTimer, 1000);
+		debug('set intervals done');
+	} else {
+		document.getElementById('getfirefox').style.visibility='visible';
+		document.getElementById('hiscores').style.visibility='hidden';
+		document.getElementById('statusbar').style.visibility='hidden';
+		document.getElementById('settings').style.visibility='hidden';
+		document.getElementById('newgame').disabled=true;
+	}
+	
+	window.onblur = onBlur;
+	window.onfocus = onFocus;
+}
+
+function init() {
+	debug('start initialization');
+	
+    ctx.fillStyle = "rgb(0,0,0)";  
+    ctx.fillRect (0, 0, screenWidth, screenHeight);
+	
+	initKeys();
+	initImages();
+	initHiscores();
+	drawHiscores();
+	initParticles();
+	showManualFirstTime();
+	
+	gameMode = MODE_INTRO;
+
+	debug('initialization finished');
+}
+
+function initImages() {
+	debug('init images');
+	addImage(imgSphere24gray,'sphere_24_gray.png');
+	addImage(imgSphere24red,'sphere_24_red.png');
+	addImage(imgSphere24green,'sphere_24_green.png');
+	addImage(imgSphere24blue,'sphere_24_blue.png');
+	addImage(imgSphere24orange,'sphere_24_orange.png');
+	addImage(imgSphere24purple,'sphere_24_purple.png');
+	addImage(imgBG01,'bg01.jpg');
+	addImage(imgSplatterGray,'splatter_gray.png');
+	addImage(imgSplatterRed,'splatter_red.png');
+	addImage(imgSplatterGreen,'splatter_green.png');
+	addImage(imgSplatterBlue,'splatter_blue.png');
+	addImage(imgSplatterOrange,'splatter_orange.png');
+	addImage(imgSplatterPurple,'splatter_purple.png');
+	addImage(imgFont1,'font3523v1.png');
+	addImage(imgDotGray,'dot_gray.png');
+	addImage(imgDotRed,'dot_red.png');
+	addImage(imgDotGreen,'dot_green.png');
+	addImage(imgDotBlue,'dot_blue.png');
+	addImage(imgDotOrange,'dot_orange.png');
+	addImage(imgDotPurple,'dot_purple.png');
+	addImage(imgTitle,'title.png');
+}
+
+
+
+function newGame(gt) {
+	debug('new game');
+
+	gameMode == MODE_INIT;
+	scoreP1 = 0;
+	stage = 0;
+	newStage();
+	
+	gameTime = gt;
+	timer = 0;
+	
+	gameMode = MODE_PLAY;
+	fadeColor = '0,0,0';
+}
+
+function doNewGameAction(gt) {
+	debug('new game action');
+	newGame(gt);
+	ctxBG.drawImage(imgBG01,0,0);
+}
+
+function doStageClearStuff() {
+	debug('stage clear');
+	gameTime += 20;
+	var ball;
+	for (var i=0;i<numOfBalls;i++) {
+		ball = balls[i];
+		drawSplatter(ball.color,ball.x+ball.radius,ball.y+ball.radius,1);
+	}
+
+	
+	newStage();
+	
+}
+
+function newStage() {
+	debug('new stage');
+	grays = 0;
+	reds = 0;
+	greens = 0;
+	blues = 0;
+	oranges = 0;
+	purples = 0;	
+	
+	stageClear = false;
+	
+	for (var i=0;i<numOfBalls;i++) {
+		balls[i] = new Sprite(i,
+						Math.round(Math.random()*(screenWidth-25)),
+						Math.round(Math.random()*(screenHeight-25)),
+						(Math.random()-Math.random())/5,
+						(Math.random()-Math.random())/5,
+						12,
+						Math.floor((i/numOfBalls)*6),
+						i
+						);
+	}
+	balls[Math.floor(Math.random()*(numOfBalls-1))].player = 1;
+	
+	gameloopDone = true;
+	
+	var oldscore = scoreP1; 
+	
+	for (var i=0;i<5;i++) {
+		doGameLoop();
+	}	
+	
+	scoreP1 = oldscore;
+	
+	stage++;
+	
+	document.getElementById('stage').innerHTML = ''+stage;
+	
+	fadeInCounter = 1.0;
+	
+	last_purple = -1;
+	last_yellow = -1;
+	last_red = -1;
+	last_green = -1;
+	last_blue = -1;
+	last_gray = -1;	
+}
+
+
+function Sprite(id,x,y,velx,vely,radius,color,index) {
+
+	// attributes
+	this.player = 0;
+	this.id = id;
+	this.x = x;
+	this.y = y;
+	this.velx = velx;
+	this.vely = vely;
+	this.radius = radius;
+	this.collision = false;
+	this.collisionArea = 0;
+	this.color = color;
+	this.index = index;
+	this.alpha = 1.0/(Math.floor(Math.random()*100));
+	this.isMoving = true;
+	this.combo = 0;
+	
+	// methods
+	this.move = move;
+	this.testCollision = testCollision;
+	this.drawSphere = drawSphere;
+}
+
+function move() {
+
+	if (this.color == COLOR_GRAY) {
+		grays++;
+		last_gray = this.index;
+	}
+	else if (this.color == COLOR_RED) {
+		reds++;
+		last_red = this.index;
+	}
+	else if (this.color == COLOR_GREEN) {
+		greens++;
+		last_green = this.index;
+	}
+	else if (this.color == COLOR_BLUE) {
+		blues++;
+		last_blue = this.index;
+	}
+	else if (this.color == COLOR_ORANGE) {
+		oranges++;
+		last_orange = this.index;
+	}
+	else if (this.color == COLOR_PURPLE) {
+		purples++;
+		last_purple = this.index;
+	}
+
+	if (this.player > 0) {
+		if (key_left)
+			this.velx -= 0.1;
+
+		if (key_right)
+			this.velx += 0.1;
+			
+		if (key_up)
+			this.vely -= 0.1;
+
+		if (key_down)
+			this.vely += 0.1;				
+	}			
+		
+	if (this.color != 0) {
+		this.velx = this.velx*0.99;
+		this.vely = this.vely*0.99;
+	}
+	
+	//this.vely += 0.1;
+	/*
+	if (flipSide) {
+		this.x += screenWidth;
+		this.y += screenHeight;
+	}
+	else {
+		this.x -= screenWidth;
+		this.y -= screenHeight;
+	}*/
+	
+	if (!flipSide) {
+
+		if (this.x+this.radius*2 > screenWidth) {
+			this.x -= screenWidth;
+		}
+
+		if (this.y+this.radius*2 > screenHeight) {
+			this.y -= screenHeight;
+		}
+	}
+	else {
+		if (this.x < 0) {
+			this.x += screenWidth;
+		}
+
+		if (this.y < 0) {
+			this.y += screenHeight;
+		}
+	}	
+		
+	
+	if (this.velx > 0.03 || this.velx < -0.03 || this.vely > 0.03 || this.vely < -0.03) {
+
+		this.x += this.velx; 
+		this.y += this.vely; 
+
+		this.isMoving = true;
+	}
+	else {
+		this.isMoving = false;
+		this.combo = 0;
+	}
+	
+
+/*
+	if (this.x+this.radius*2 > screenWidth && this.velx > 0) {
+		this.velx = -this.velx;
+		this.x = screenWidth-this.radius*2;
+	}
+		
+	if (this.x < 0  && this.velx < 0) {
+		this.velx = -this.velx;
+		this.x = 0;
+	}
+		
+	if (this.y+this.radius*2 > screenHeight && this.vely > 0) {
+		this.vely = -this.vely;
+		this.y = screenHeight-this.radius*2;
+	}
+		
+	if (this.y < 0 && this.vely < 0) {
+		this.vely = -this.vely;	
+		this.y = 0;
+	}
+		*/
+	this.collision = false;
+		
+}
+
+
+
+function drawSplatter(color, x, y, mag) {
+
+	mag /= 2;
+
+	if (mag < 0.75)
+		mag = 0.75;
+
+	if (mag > 1.5)
+		mag = 1.5;		
+		
+	ctxBG.save();
+	ctxBG.translate(x,y);
+	ctxBG.rotate(Math.random());
+	if (color == COLOR_GRAY) {
+		ctxBG.drawImage(imgSplatterGray,0-32*mag,0-32*mag,64*mag,64*mag);
+	}
+	else if (color == COLOR_RED) {
+		ctxBG.drawImage(imgSplatterRed,0-32*mag,0-32*mag,64*mag,64*mag);
+	}
+	else if (color == COLOR_GREEN) {
+		ctxBG.drawImage(imgSplatterGreen,0-32*mag,0-32*mag,64*mag,64*mag);
+	}
+	else if (color == COLOR_BLUE) {
+		ctxBG.drawImage(imgSplatterBlue,0-32*mag,0-32*mag,64*mag,64*mag);
+	}
+	else if (color == COLOR_PURPLE) {
+		ctxBG.drawImage(imgSplatterPurple,0-32*mag,0-32*mag,64*mag,64*mag);
+	}
+	else if (color == COLOR_ORANGE) {
+		ctxBG.drawImage(imgSplatterOrange,0-32*mag,0-32*mag,64*mag,64*mag);
+	}	
+	
+	ctxBG.restore();
+}
+
+function testCollision(other) {
+
+	if (this.id == other.id || this.collision || other.collision) 
+		return false;
+
+	if (this.collisionArea != other.collisionArea && this.collisionArea != 0 && other.collisionArea != 0)
+		return false;
+
+		
+	var dx = (other.x+other.radius) - (this.x+this.radius);
+	var dy = (other.y+other.radius) - (this.y+this.radius);
+	var dist = Math.sqrt(dx*dx+dy*dy);
+
+	if (dist <= other.radius+this.radius) {
+		this.collision = true;		
+		other.collision = true;
+		
+		var mag1 = Math.sqrt(this.velx*this.velx+this.vely*this.vely);
+		var mag2 = Math.sqrt(other.velx*other.velx+other.vely*other.vely);
+		
+//		if (this.player > 0 || other.player > 0) {
+//		}
+		
+		other.velx = (mag1*dx/dist)*0.95;
+		other.vely = (mag1*dy/dist)*0.95;
+		this.velx = -(mag2*dx/dist)*0.95;
+		this.vely = -(mag2*dy/dist)*0.95;
+
+		if (other.color == COLOR_GRAY) {
+			if (other.velx > 2.0)
+				other.velx = 2.0;
+			else if (other.velx < -2.0)
+				other.velx = -2.0;
+			if (other.vely > 2.0)
+				other.vely = 2.0;
+			else if (other.vely < -2.0)
+				other.vely = -2.0;
+		}
+		
+		if (this.color == COLOR_GRAY) {
+			if (this.velx > 2.0)
+				this.velx = 2.0;
+			else if (this.velx < -2.0)
+				this.velx = -2.0;
+			if (this.vely > 2.0)
+				this.vely = 2.0;
+			else if (this.vely < -2.0)
+				this.vely = -2.0;
+		}		
+		
+		this.x = this.x - (dx/dist)*(this.radius+other.radius-dist);
+		this.y = this.y - (dy/dist)*(this.radius+other.radius-dist);
+		other.x = other.x + (dx/dist)*(this.radius+other.radius-dist);
+		other.y = other.y + (dy/dist)*(this.radius+other.radius-dist);
+		var cx = (this.x+this.radius+other.x+other.radius)/2;
+		var cy = (this.y+this.radius+other.y+other.radius)/2;
+
+		if (mag1 > mag2) {
+			if (this.player == 0) {
+				other.combo = this.combo;
+				if (other.color != this.color) {
+					other.color = this.color;
+					if (other.combo < 2)
+						other.combo++;
+					drawSplatter(this.color,cx,cy,mag1+mag2);
+					addParticleEffectDots(this.color,10+Math.round(mag1+mag2),cx,cy,other.velx,other.vely);
+					if (this.color != COLOR_GRAY) {
+						addScore(this.combo);
+					}
+				}
+			}
+			else {
+				this.color = other.color;
+				other.combo = 1;
+			}
+			
+			this.velx += Math.random()/5.0;
+			this.vely += Math.random()/5.0;
+			this.velx -= Math.random()/5.0;
+			this.vely -= Math.random()/5.0;							
+		}
+		else if (mag2 > mag1) {
+			if (other.player == 0) {
+				this.combo = other.combo+1;
+				if (other.color != this.color) {
+					this.color = other.color;
+					if (this.combo < 2)
+						this.combo++;
+					drawSplatter(this.color,cx,cy,mag1+mag2);
+					addParticleEffectDots(this.color,10+Math.round(mag1+mag2),cx,cy,other.velx,other.vely);
+					if (other.color != COLOR_GRAY) {
+						addScore(other.combo);
+					}
+				}
+			}
+			else {
+				other.color = this.color;
+				this.combo = 1;
+			}
+				
+			other.velx += Math.random()/5.0;
+			other.vely += Math.random()/5.0;
+			other.velx -= Math.random()/5.0;
+			other.vely -= Math.random()/5.0;							
+		}		
+		return true;
+	}
+	return false;
+}
+
+function drawSphere(ctx) {
+
+	if (this.alpha < 1.0) {
+		ctx.globalAlpha = this.alpha;
+		this.alpha += 0.025;
+	}
+	else {
+		ctx.globalAlpha = 1.0;
+	}
+
+	if (this.player > 0) {
+		ctx.beginPath();
+		ctx.strokeStyle = "rgba(255,255,255,0.3)";  
+		ctx.moveTo(0,this.y+this.radius);
+		ctx.lineTo(screenWidth,this.y+this.radius);
+		ctx.moveTo(this.x+this.radius,0);
+		ctx.lineTo(this.x+this.radius,screenHeight);
+		ctx.stroke();
+		ctx.closePath();
+	}
+
+	//this.color = this.collisionArea;
+	
+	if (this.color == 0) {
+		ctx.drawImage(imgSphere24gray,this.x,this.y);
+		//ctxBG.fillStyle = 'rgba(128,128,128,0.1)';  
+		//ctxBG.fillRect (this.x+this.radius, this.y+this.radius, 1, 1);	
+	}
+	if (this.color == 1) {
+		ctx.drawImage(imgSphere24red,this.x,this.y);
+		//ctxBG.fillStyle = 'rgba(255,0,0,0.1)';  
+		//ctxBG.fillRect (this.x+this.radius, this.y+this.radius, 1, 1);	
+	}
+	if (this.color == 2) {
+		ctx.drawImage(imgSphere24green,this.x,this.y);
+		//ctxBG.fillStyle = 'rgba(0,255,0,0.1)';  
+		//ctxBG.fillRect (this.x+this.radius, this.y+this.radius, 1, 1);		
+	}
+	if (this.color == 3) {
+		ctx.drawImage(imgSphere24blue,this.x,this.y);
+	}
+	if (this.color == 4) {
+		ctx.drawImage(imgSphere24orange,this.x,this.y);
+	}
+	if (this.color == 5) {
+		ctx.drawImage(imgSphere24purple,this.x,this.y);	
+	}
+
+	
+
+}
+
+function moveSprites() {
+	
+	var ball;
+
+	last_purple = 0;
+	last_yellow = 0;
+	last_red = 0;
+	last_green = 0;
+	last_blue = 0;
+	last_gray = 0;		
+	
+	for (var i in balls) {
+		ball = balls[i];
+		ball.move();
+	}
+	
+	if (reds == 1) {
+		balls[last_red].velx += Math.random()/10;
+		balls[last_red].velx -= Math.random()/10;
+		balls[last_red].vely += Math.random()/10;
+		balls[last_red].vely -= Math.random()/10;
+	}
+	if (greens == 1) {
+		balls[last_green].velx += Math.random()/10;
+		balls[last_green].velx -= Math.random()/10;
+		balls[last_green].vely += Math.random()/10;
+		balls[last_green].vely -= Math.random()/10;
+	}
+	if (blues == 1) {
+		balls[last_blue].velx += Math.random()/10;
+		balls[last_blue].velx -= Math.random()/10;
+		balls[last_blue].vely += Math.random()/10;
+		balls[last_blue].vely -= Math.random()/10;
+	}
+	if (oranges == 1) {
+		balls[last_orange].velx += Math.random()/10;
+		balls[last_orange].velx -= Math.random()/10;
+		balls[last_orange].vely += Math.random()/10;
+		balls[last_orange].vely -= Math.random()/10;
+	}
+	if (purples == 1) {
+		balls[last_purple].velx += Math.random()/10;
+		balls[last_purple].velx -= Math.random()/10;
+		balls[last_purple].vely += Math.random()/10;
+		balls[last_purple].vely -= Math.random()/10;
+	}	
+}
+
+function collideSprites() {
+
+	var ball;
+
+	for (var i in balls) {
+		ball = balls[i];
+		//if (ball.velx > 0.03 || ball.velx < -0.03 || ball.vely > 0.03 || ball.vely < -0.03) {
+		if (ball.isMoving) {
+		
+			if (ball.x >= 0 && ball.x+ball.radius*2 < screenWidth/2 && ball.y >= 0 && ball.y+ball.radius*2 < screenHeight/2) {
+				ball.collisionArea = 1;
+			}
+			else if (ball.x >= screenWidth/2 && ball.x+ball.radius*2 < screenWidth && ball.y >= 0 && ball.y+ball.radius*2 < screenHeight/2) {
+				ball.collisionArea = 2;
+			}
+			else if (ball.x >= 0 && ball.x+ball.radius*2 < screenWidth/2 && ball.y >= screenHeight/2 && ball.y+ball.radius*2 < screenHeight) {
+				ball.collisionArea = 3;
+			}
+			else if (ball.x >= screenWidth/2 && ball.x+ball.radius*2 < screenWidth && ball.y >= screenWidth/2 && ball.y+ball.radius*2 < screenHeight) {
+				ball.collisionArea = 4;
+			}
+			else {
+				ball.collisionArea = 0;
+			}			
+		
+			for (var j in balls) {
+				if (ball.collision)
+					break;
+				ball.testCollision(balls[j]);
+			}
+		}
+	}
+}
+
+function doGameLoop() {
+
+	if (pause || !gameloopDone || !allImagesLoaded || gameMode == MODE_GAMEOVER || gameMode == MODE_DONE) 
+		return;
+		
+	if (gameMode == MODE_INTRO)	{
+		return;
+	}
+		
+	gameloopDone = false;
+		
+	grays = 0;
+	reds = 0;
+	greens = 0;
+	blues = 0;
+	oranges = 0;
+	purples = 0;		
+		
+	collideSprites();
+	
+	moveSprites();
+	
+	if (enableParticles)
+		moveParticles();
+
+	loops++;
+	
+	isStageClear();
+	
+	if (stageClear) {
+		doStageClearStuff();
+		//newStage();
+	}
+	
+	flipSide = !flipSide;
+	
+	gameloopDone = true;
+}
+
+function isStageClear() {
+
+	if (stageClear)
+		return;
+
+		
+		
+	if (grays == numOfBalls) {
+		stageClear = true;
+		fadeColor ='0,0,0';
+	}
+	if (reds == numOfBalls) {
+		stageClear = true;
+		addScore(100);
+		fadeColor ='255,0,0';
+	}
+	if (greens == numOfBalls) {
+		stageClear = true;
+		addScore(100);
+		fadeColor ='0,255,0';
+	}
+	if (blues == numOfBalls) {
+		stageClear = true;
+		addScore(100);
+		fadeColor ='0,0,255';
+	}
+	if (oranges == numOfBalls) {
+		stageClear = true;
+		addScore(100);
+		fadeColor ='255,128,0';
+	}	
+	if (purples == numOfBalls) {
+		stageClear = true;
+		addScore(100);
+		fadeColor ='255,0,255';
+	}	
+}
+
+function countTimer() {
+	if (!allImagesLoaded || pause || gameMode != MODE_PLAY) {
+		return;
+	}
+
+	timer++;
+	document.getElementById('timer').innerHTML = Math.floor(timer/60)+':'+timer%60+' / '+Math.floor(gameTime/60)+':'+gameTime%60;
+	
+	if (timer >= gameTime && gameMode != MODE_GAMEOVER) {
+		gameMode = MODE_GAMEOVER;
+		insertHiscore(newHiscore(scoreP1,document.getElementById('playername').value,stage,gameTime));
+		saveHiscores();
+		drawHiscores();
+	}
+}
+
+
+
+
+
+
+function doRenderLoop() {
+
+	ctx.globalAlpha = 1.0;
+
+	if (gameMode == MODE_DONE)
+		return;
+
+	if (!allImagesLoaded) {
+		/*
+		ctx.font = "10px Verdana";
+		ctx.fillStyle = "White";  
+		ctx.fillText("Loading images", 5, 50);	
+		*/
+		ctx.strokeStyle = "rgb(255,255,255)";  
+		ctx.strokeRect(5, 60, numOfImages*20, 20);		
+		ctx.fillStyle = "rgb(255,255,255)";  
+		ctx.fillRect(5, 60, imagesLoaded*20, 20);
+
+		return;
+	}
+
+	if (gameMode == MODE_INTRO) {
+		
+		ctx.globalAlpha = 1.0;
+		
+		if (fadeInCounter > 0.0) {
+			ctx.globalAlpha = 1.0-fadeInCounter;
+			fadeInCounter -= 0.025;
+		}
+		ctx.drawImage(imgTitle,0,0);
+		drawText('CLICK TO START',screenWidth/2-(14*35)/2,screenHeight/2-12);	
+		return;
+	}
+	
+	if (!renderloopDone)
+		return;
+	
+	renderloopDone = false;
+	
+	
+	if (!pause) {
+		pauseDrawn = false;
+		//ctx.drawImage(canvasBG,0,0);
+		ctx.clearRect(0,0,screenWidth,screenHeight);
+		//ctx.fillStyle = 'rgba(0,0,0,0.5)';  
+		//ctx.fillRect (0, 0, screenWidth, screenHeight);
+		ctx.globalAlpha = 1.0;
+		renderSprites();
+		if (enableParticles)
+			renderParticles();
+		
+		ctx.globalAlpha = 1.0;
+		if (fadeInCounter > 0.0) {
+			ctx.fillStyle = 'rgba('+fadeColor+','+fadeInCounter+')';  
+			ctx.fillRect (0, 0, screenWidth, screenHeight);			
+			fadeInCounter -= 0.025;
+			drawText("STAGE "+stage,screenWidth/2-(7*35)/2,screenHeight/2-12);	
+		}		
+
+	} else {
+		/*
+		ctx.font = "10px Verdana";
+		ctx.fillStyle = "White";  
+		ctx.fillText("PAUSE", 5, 30);		
+		*/
+		if (!pauseDrawn) {
+			ctx.fillStyle = "rgba(0,0,96,0.5)";  
+			ctx.fillRect (0, 0, screenWidth, screenHeight);	
+			//blur();
+			drawText("PAUSE",screenWidth/2-(5*35)/2,screenHeight/2-12);		
+			pauseDrawn = true;
+		}
+	}
+
+
+	
+	
+	if (gameMode == MODE_GAMEOVER) {
+		ctx.fillStyle = "rgba(0,0,70,0.5)";  
+		ctx.fillRect (0, screenHeight/2-90, screenWidth, 180);
+		drawText("GAME OVER",screenWidth/2-(9*35)/2,screenHeight/2-12-35);		
+		
+		drawText("SCORE:",screenWidth/2-(6*35)/2,screenHeight/2-12+25);	
+		var scoreText = ''+scoreP1;
+		drawText(scoreText,screenWidth/2-(scoreText.length*35)/2,screenHeight/2-12+60);	
+		
+		gameMode = MODE_DONE;
+	}
+	
+	frames++;
+	
+	renderloopDone = true;
+}
+
+
+
+function doResetHiscoresAction() {
+	resetHiscores();
+	saveHiscores();
+	drawHiscores();
+}
+
+function drawHiscores() {
+	var scoretable = document.getElementById('scoretable');
+	scoretable.innerHTML = '<div><span style="position:relative;left:0">rank</span><span style="position:absolute;left:40">score</span><span style="position:absolute;left:90">name</span><span style="position:absolute;left:190">stage</span><span style="position:absolute;left:240">time</span></div>';
+	for (var i=0;i<numOfHiscores;i++) {
+		if (i != newHiscoreIndex)
+			scoretable.innerHTML += '<div class="hiscore"><span style="position:relative;left:0">'+(i+1)+'.</span><span style="position:absolute;left:40">'+hiscores[i].score+'</span><span style="position:absolute;left:90">'+hiscores[i].name+'</span><span style="position:absolute;left:190">'+hiscores[i].stage+'</span><span style="position:absolute;left:240">'+Math.floor(hiscores[i].time/60)+':'+(hiscores[i].time%60)+'</span></div>';
+		else
+			scoretable.innerHTML += '<div class="new_hiscore"><span style="position:relative;left:0">'+(i+1)+'.</span><span style="position:absolute;left:40">'+hiscores[i].score+'</span><span style="position:absolute;left:90">'+hiscores[i].name+'</span><span style="position:absolute;left:190">'+hiscores[i].stage+'</span><span style="position:absolute;left:240">'+Math.floor(hiscores[i].time/60)+':'+(hiscores[i].time%60)+'</span></div>';
+			
+	}	
+	if (!enableHiscores) {
+		scoretable.innerHTML += '<div style="color:#811;">Hiscore saving is disabled (no browser support)</div>';
+	}
+	scoretable.innerHTML += '<div><input type="button" class="button" value="Reset Hiscores" onclick="doResetHiscoresAction()"/></div>';
+}
+
+function renderSprites() {
+	var ball;
+	for (var i in balls) {
+		ball = balls[i];
+		ball.drawSphere(ctx);
+		
+		if (ball.x < 0) {
+			ball.x += screenWidth;
+			ball.drawSphere(ctx);
+			ball.x -= screenWidth;
+		}
+		
+		if (ball.y < 0) {
+			ball.y += screenHeight;
+			ball.drawSphere(ctx);
+			
+			if (ball.x < 0) {
+				ball.x += screenWidth;
+				ball.drawSphere(ctx);
+				ball.x -= screenWidth;
+			}			
+			
+			ball.y -= screenHeight;
+		}
+		
+		if (ball.x+ball.radius*2 > screenWidth) {
+			ball.x -= screenWidth;
+			ball.drawSphere(ctx);
+			ball.x += screenWidth;
+		}
+		
+		if (ball.y+ball.radius*2 > screenHeight) {
+			ball.y -= screenHeight;
+			ball.drawSphere(ctx);
+			
+			if (ball.x+ball.radius*2 > screenWidth) {
+				ball.x -= screenWidth;
+				ball.drawSphere(ctx);
+				ball.x += screenWidth;
+			}
+			
+			
+			ball.y += screenHeight;
+		}		
+		
+	}
+}
+
+function addScore(score) {
+	scoreP1 += score;
+	document.getElementById('score').innerHTML = ''+scoreP1;
+}
+
+function doEnableParticlesAction() {
+	enableParticles = !enableParticles;
+	document.getElementById('enableParticles').checked = enableParticles;
+	debug('enableParticles = '+enableParticles);
+}
+
+function addFrames() {
+	addContainerToElement('reuna1','getfirefox','100%');
+	addContainerToElement('reuna2','heading','500px');
+	addContainerToElement('reuna2','hiscores','330px');
+	addContainerToElement('reuna3','player','100%');
+	addContainerToElement('reuna2','settings','330px');
+	addContainerToElement('reuna2','statusbar','500px');
+	addContainerToElement('reuna1','manual','480px',true);
+}
+
+function doClickCanvasAction() {
+	if (gameMode == MODE_INTRO || gameMode == MODE_DONE) {
+		doNewGameAction(3*60);
+	}
+}
+
+function doChangePlayerNameAction() {
+
+	debug('player name changed');
+
+	if (typeof localStorage == "undefined" && typeof globalStorage == "undefined") {
+		// client side saving is not supported/enabled
+		debug('localStorage is not supported for saving player\'s name');
+		return;
+	}
+
+	if (typeof localStorage == "undefined" && typeof globalStorage != "undefined") {
+		try {
+			debug('localStorage not found. using globalStorage['+location.hostname+']');
+			var localStorage = globalStorage[location.hostname];
+		} catch (e) {
+			debug('no priviliges to access globalStore');
+			return;
+		}
+	}
+
+	localStorage.setItem('player1name',document.getElementById('playername').value);
+}
+
+</script>
+</head>
+<body onload="addFrames(); onLoad();" class="body">
+
+
+	
+
+	<div style="width:840;margin-left:auto;margin-right:auto;">
+		<div id="main" name="main" style="position:relative;">
+			
+			<div id="heading" name="heading" style="position:relative;">
+				<div class="heading1">Q-Lat (browser version)</div>
+				<div style="position:absolute;right:50;bottom:0;">
+					<div style="border: solid 1px #444;"><input id="newgame" name="newgame" type="button" value="Start New Game" onclick="doNewGameAction(3*60);" class="button_new_game" /></div>
+				</div>
+				<div style="position:absolute;right:4;top:0;">
+					<div onclick="document.getElementById('manual').style.visibility='visible'" title="Click me to open manual"><img src="img/info.png"/></div>
+				</div>
+
+				
+			</div>
+			
+			<div id="canvasarea" name="canvasarea" style="position:relative">
+				<div class="canvas1">
+					<canvas id="bg" name="game" width="500" height="500"></canvas>
+				</div>			
+				<div class="canvas2" onclick="doClickCanvasAction();">
+					<canvas id="game" name="game" width="500" height="500">
+
+					</canvas>
+
+					<div id="getfirefox" name="getfirefox" style="visibility:hidden;position:absolute;left:0;top:0;">
+						<div class="content">I'm terrible sorry, but unfortunately Q-Lat can't run in some web browser like the one you are using now, since they do not support the new features of HTML 5. Perhaps now it would be a good time to update your browser to a more secure and faster one? </div>
+						<div class="content">Below is a list of web browsers that are currently supported. They are all free and take only a few minutes to install. Click an image to open a download page.</div>
+						<hr/>
+						<div class="content_browser_support"><a href="http://www.getfirefox.net/"><img src="img/firefox.png" border="0px"/>Firefox</a> 3.5.* (recommended)</div>
+						<div class="content_browser_support"><a href="http://www.google.com/chrome"><img src="img/chrome.png" border="0px"/>Google Chrome</a> 2.x (works, but hiscores are not saved)</div>
+						<div class="content_browser_support"><a href="http://www.apple.com/safari/download/"><img src="img/safari.png" border="0px"/>Safari</a> (works, but hiscores are not saved)</div>
+						<div class="content_browser_support"><a href="http://www.opera.com/"><img src="img/opera.png" border="0px"/>Opera</a> (works, but hiscores are not saved)</div>
+					</div>
+					
+					
+					
+				</div>
+			</div>
+			
+			<div style="position:relative;" id="statusbar" name="statusbar">
+				<div style="font:bold 12px Verdana;position:relative;left:0;top:0;">SCORE: <span id="score" name="score"></span></div>
+				<div style="font:bold 12px Verdana;position:absolute;left:180;top:0;">STAGE: <span id="stage" name="score"></span></div>
+				<div style="font:bold 12px Verdana;position:absolute;left:310;top:0;">TIME: <span id="timer" name="timer"></span></div>
+			</div>
+			
+			<div id="hiscores" name="hiscores" style="font:normal 10px Verdana; position:absolute;right:0px;top:20px;color:#FFF;">
+				<div class="heading2">TOP 20 HISCORES</div>
+				<hr/>
+				<div><span id="scoretable" name="scoretable"></span></div>
+				<br/>
+				<div id="player" name="player" class="content">
+					player name:<input id="playername" name="playername" type="text" class="input" onkeyup="doChangePlayerNameAction();" />
+				</div>
+			</div>
+			
+			<div style="font:normal 10px Verdana;position:absolute;right:0px;top:460px;color:#FFF;" id="settings" name="settings">
+				<div class="heading2">SETTINGS</div>
+				<hr/>
+				<div class="heading3">FRAME RATE</div>
+				<div>
+					<input type="button" class="button" value="20 FPS" onclick="setFPS(20);"/>
+					<input type="button" class="button" value="30 FPS" onclick="setFPS(30);"/>
+					<input type="button" class="button" value="40 FPS" onclick="setFPS(40);"/>
+					<input type="button" class="button" value="60 FPS" onclick="setFPS(60);"/>
+				</div>
+				<div><input id="enableParticles" name="enableParticles" type="checkbox" class="button" onchange="doEnableParticlesAction();" checked />particles</div>
+			</div>
+			
+			<div class="content">Q-Lat Browser v1.2009-12-27 &copy; 2009 Janne Kivilahti / Piste Gamez</div>
+			<div class="content">The game uses features from HTML 5 that are fully or partly supported in browsers: Firefox, Google Chrome, Safari, Opera</div>
+			<div class="content">fps:<span id="fps" name="fps"></span></div>
+			
+			<div id="manual" name="manual" style="visibility:hidden;position:absolute;left:100;top:100;">
+				<div class="heading2">MANUAL</div>
+				<hr/>
+				<div class="heading3">GOAL</div>
+				<div class="content">Clear stages by turning all the balls to the same color by pushing them against each other.</div>
+				<div class="content">You have only a limited amount of time starting from 3 minutes. <br/>Beware of the dark gray balls, since you don't get any points from them.</div>
+				<br/>
+				<div class="heading3">CONTROLS</div>
+				<div class="content">Use arrow keys or W, A, S and D to move the ball.</div>
+				<div class="content">P=Pause</div>
+				<br/>
+				<div class="heading3">SCORING</div>
+				<div class="content">
+					<ul>
+						<li>Turning a ball to another color: 1 point (not including the dark gray balls)</li>
+						<li>Turning many balls to another color with one push: 2 points from every additional ball in the combo</li>
+						<li>Clearing a stage: 100 points (except if all the balls are dark gray)</li>
+						<li>You also get 20 extra seconds from every stage you clear.</li>
+						<li>Hiscores will be stored in your browser if your browser supports it (e.g. Firefox).</li>
+					</ul>
+				</div>
+				<br/>
+				<div class="content">Happy hiscore hunting!</div>
+				<div class="content"></div>
+			</div>			
+			
+		</div>
+	</div>
+
+	<div id="info" name="info"></div>
+	<br/>
+	<div id="console" name="console" style="font:normal 10px Verdana;position:absolute;left:10;bottom:1;visibility:hidden;">
+		<div>fps average<span id="fps_avg" name="fps_avg"></span></div>
+		<div>loops/second:<span id="loops" name="loops"></span></div>
+		<div>input:<span id="input" name="input"></span></div>
+		<div id="debug" name="debug" style="width:800px;max-height:150px;border:solid 1px #000; overflow: auto;"></div>
+	</div>
+
+
+	
+</body>
+</html>
